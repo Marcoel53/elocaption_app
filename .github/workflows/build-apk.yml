@@ -6,11 +6,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         
+      - name: List files
+        run: |
+          echo "=== Estrutura do repositório ==="
+          ls -la
+          echo "=== Verificando pubspec.yaml ==="
+          cat pubspec.yaml || echo "pubspec.yaml não encontrado!"
+          
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -22,12 +31,15 @@ jobs:
           mkdir -p android
           echo "flutter.sdk=${{ runner.tool_cache }}/flutter" > android/local.properties
           echo "sdk.dir=${{ runner.tool_cache }}/android-sdk" >> android/local.properties
+          cat android/local.properties
           
       - name: Install dependencies
         run: flutter pub get
         
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          flutter build apk --release
+          ls -la build/app/outputs/flutter-apk/
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
