@@ -11,26 +11,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+        
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
+          channel: 'stable'
           
-      - name: List files
-        run: ls -la
+      - name: Enable Flutter Android
+        run: flutter config --enable-android
         
       - name: Install dependencies
-        run: |
-          flutter pub get
-          flutter clean
-          
+        run: flutter pub get
+        
       - name: Build APK
-        run: |
-          flutter build apk --release
-          ls -la build/app/outputs/flutter-apk/
+        run: flutter build apk --release
         
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
