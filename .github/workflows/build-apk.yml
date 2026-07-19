@@ -11,26 +11,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-        
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
           channel: 'stable'
           
-      - name: Enable Flutter Android
-        run: flutter config --enable-android
-        
-      - name: Install dependencies
+      - name: Create local.properties
         run: |
-          flutter pub get
-          flutter clean
+          mkdir -p android
+          echo "flutter.sdk=${{ runner.tool_cache }}/flutter" > android/local.properties
+          echo "sdk.dir=${{ runner.tool_cache }}/android-sdk" >> android/local.properties
           
+      - name: Install dependencies
+        run: flutter pub get
+        
       - name: Build APK
         run: flutter build apk --release
         
